@@ -52,6 +52,8 @@ dt = 0  # Delta time
 ball_speed = 3
 ball_pos = pygame.Vector2(screen.get_width()/2, screen.get_height()/2)
 
+x_direction_normalised_global, y_direction_normalised_global = 0, 0
+
 def clamp_paddle(position_y):
     position_y = max(pad_height/2, position_y)  # top boundary
     position_y = min(screen.get_height() - pad_height/2, position_y)  # bottom boundary
@@ -78,6 +80,8 @@ def handle_input():
         ball_running = True
 
 def get_ball_direction():
+    global x_direction_normalised_global, y_direction_normalised_global
+
     x_direction_non_normalised = 2*screen.get_width()*random.random() - screen.get_width()
     y_direction_non_normalised = 2*screen.get_height()*random.random() - screen.get_height()
 
@@ -85,9 +89,10 @@ def get_ball_direction():
 
     x_direction_normalised, y_direction_normalised = x_direction_non_normalised/norm, y_direction_non_normalised/norm
 
+    x_direction_normalised_global, y_direction_normalised_global = x_direction_normalised, y_direction_normalised
     return x_direction_normalised, y_direction_normalised
 
-ball_direction_x, ball_direction_y = get_ball_direction()
+x_direction_normalised_global, y_direction_normalised_global = get_ball_direction()
 ball_running = False
 
 while running:
@@ -101,8 +106,11 @@ while running:
 
     # --- UPDATE BALL ---
     if ball_running:
-        ball_pos.x += ball_direction_x*ball_speed
-        ball_pos.y += ball_direction_y*ball_speed
+        ball_pos.x += x_direction_normalised_global*ball_speed
+        ball_pos.y += y_direction_normalised_global*ball_speed
+
+        if ball_pos.y >= screen.get_height() or ball_pos.y <= 0:
+            y_direction_normalised_global *= -1
 
     # --- Keep paddles on screen ---
     red_pos.y = clamp_paddle(red_pos.y)
