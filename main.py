@@ -1,4 +1,26 @@
+'''
+┌──────────────────────────────┐
+│          Game Loop           │
+│                              │
+│  ┌────────────────────────┐  │
+│  │ 1. Handle Input        │  │ ← Move paddles
+│  └────────────────────────┘  │
+│  ┌────────────────────────┐  │
+│  │ 2. Update Ball         │  │ ← Update position by velocitys
+│  │     - Move             │  │ ← pos += dir * speed * dt
+│  │     - Check Collisions │  │ ← Walls / Paddles
+│  │     - Reset if Missed  │  │
+│  └────────────────────────┘  │
+│  ┌────────────────────────┐  │
+│  │ 3. Draw Everything     │  │
+│  └────────────────────────┘  │
+└──────────────────────────────┘
+
+'''
+
 import pygame
+import random
+import math
 
 # Initialize Pygame
 pygame.init()
@@ -21,22 +43,23 @@ ball_size = 10
 red_pos = pygame.Vector2(pad_width/2, screen.get_height()/2)  # LEFT paddle center
 blue_pos = pygame.Vector2(screen.get_width() - pad_width/2, screen.get_height()/2)  # RIGHT paddle center
 
-ball_pos = pygame.Vector2(screen.get_width()/2, screen.get_height()/2)
-
-
 # Movement speed (pixels per second)
 speed = 1000
 
 running = True
 dt = 0  # Delta time
 
-while running:
-    # Handle events
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT:
-            running = False
+ball_speed = 3
+ball_pos = pygame.Vector2(screen.get_width()/2, screen.get_height()/2)
 
-    # --- Input ---
+def clamp_paddle(position_y):
+    position_y = max(pad_height/2, position_y)  # top boundary
+    position_y = min(screen.get_height() - pad_height/2, position_y)  # bottom boundary
+    return position_y
+
+def handle_input():
+    global ball_running
+
     keys = pygame.key.get_pressed()
     
     # LEFT paddle movement
@@ -50,16 +73,42 @@ while running:
         blue_pos.y -= speed * dt
     if keys[pygame.K_DOWN]:
         blue_pos.y += speed * dt
+    
+    if keys[pygame.K_SPACE]:
+        ball_running = True
+
+def get_ball_direction():
+    x_direction_non_normalised = 2*screen.get_width()*random.random() - screen.get_width()
+    y_direction_non_normalised = 2*screen.get_height()*random.random() - screen.get_height()
+
+    norm = math.sqrt(x_direction_non_normalised**2 + y_direction_non_normalised**2)
+
+    x_direction_normalised, y_direction_normalised = x_direction_non_normalised/norm, y_direction_non_normalised/norm
+
+    return x_direction_normalised, y_direction_normalised
+
+ball_direction_x, ball_direction_y = get_ball_direction()
+ball_running = False
+
+while running:
+    # HANDLE EVENTS:
+    for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            running = False
+
+    # --- INPUT ---
+    handle_input()
+
+    # --- UPDATE BALL ---
+    if ball_running:
+        ball_pos.x += ball_direction_x*ball_speed
+        ball_pos.y += ball_direction_y*ball_speed
 
     # --- Keep paddles on screen ---
-    # Use center-based boundaries
-    red_pos.y = max(pad_height/2, red_pos.y)  # top boundary
-    red_pos.y = min(screen.get_height() - pad_height/2, red_pos.y)  # bottom boundary
+    red_pos.y = clamp_paddle(red_pos.y)
+    blue_pos.y = clamp_paddle(blue_pos.y)
 
-    blue_pos.y = max(pad_height/2, blue_pos.y) # top boundary
-    blue_pos.y = min(screen.get_height() - pad_height/2, blue_pos.y)  # bottom boundary
-
-    # --- Drawing ---
+    # --- DRAW EVERYTHING ---
     screen.fill(BLACK)
     # Draw paddles using center-based coordinates
     pygame.draw.rect(screen, WHITE, (red_pos.x - pad_width/2, red_pos.y - pad_height/2, pad_width, pad_height))
