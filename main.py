@@ -37,7 +37,7 @@ BLACK = (0, 0, 0)
 pad_width, pad_height = 20, 150
 
 # circle properties
-ball_size = 10
+ball_radius = 10
 
 # Use geometric center for positions
 red_pos = pygame.Vector2(pad_width/2, screen.get_height()/2)  # LEFT paddle center
@@ -112,6 +112,40 @@ while running:
         if ball_pos.y >= screen.get_height() or ball_pos.y <= 0:
             y_direction_normalised_global *= -1
 
+        ball_rect = pygame.Rect(
+            ball_pos.x - ball_radius,
+            ball_pos.y - ball_radius,
+            ball_radius * 2,
+            ball_radius * 2
+        )
+
+        red_rect = pygame.Rect(
+            red_pos.x - pad_width / 2,
+            red_pos.y - pad_height / 2,
+            pad_width,
+            pad_height
+        )
+
+        blue_rect = pygame.Rect(
+            blue_pos.x - pad_width / 2,
+            blue_pos.y - pad_height / 2,
+            pad_width,
+            pad_height
+        )
+
+        if ball_rect.colliderect(red_rect):
+            x_direction_normalised_global *= -1
+            ball_pos.x = red_rect.right + ball_radius  # push it out a bit
+
+            ball_speed += 1
+
+        elif ball_rect.colliderect(blue_rect):
+            x_direction_normalised_global *= -1
+            ball_pos.x = blue_rect.left - ball_radius  # push it out a bit
+
+            ball_speed += 1
+
+
     # --- Keep paddles on screen ---
     red_pos.y = clamp_paddle(red_pos.y)
     blue_pos.y = clamp_paddle(blue_pos.y)
@@ -122,7 +156,7 @@ while running:
     pygame.draw.rect(screen, WHITE, (red_pos.x - pad_width/2, red_pos.y - pad_height/2, pad_width, pad_height))
     pygame.draw.rect(screen, WHITE, (blue_pos.x - pad_width/2, blue_pos.y - pad_height/2, pad_width, pad_height))
 
-    pygame.draw.circle(screen, "white", ball_pos, ball_size)
+    pygame.draw.circle(screen, "white", ball_pos, ball_radius)
 
     pygame.display.flip()
 
