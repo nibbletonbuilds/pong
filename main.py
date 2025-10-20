@@ -25,6 +25,8 @@ import math
 # Initialize Pygame
 pygame.init()
 
+pygame.display.set_caption("pong -- by nibbleton")
+
 # Screen setup
 screen = pygame.display.set_mode((1920, 1000))
 clock = pygame.time.Clock()
@@ -95,11 +97,43 @@ def get_ball_direction():
 x_direction_normalised_global, y_direction_normalised_global = get_ball_direction()
 ball_running = False
 
+blue_score, red_score = 0, 0
+
+font_size = 200
+font = pygame.font.Font("boldpixels/BoldPixels.ttf", font_size)
+
+final_text_size = 100
+
 while running:
+
     # HANDLE EVENTS:
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
+
+    if red_score == 1:
+        screen.fill((0, 0, 0))
+        final_text_content = "RIGHT WON!"
+        final_text = font.render(final_text_content, True, (255, 255, 255))
+        screen.blit(blue_score_text, (screen.get_width()/2 - screen.get_width()/4 - final_text_size/2, 50))  # top-left corner
+        screen.blit(red_score_text, (screen.get_width()/2 + screen.get_width()/4 - final_text_size/2, 50))  # top-left corner
+        screen.blit(final_text, (screen.get_width()/2 - len(final_text_content)*final_text_size/2, screen.get_height()/2 - final_text_size/2))
+        pygame.display.flip()
+        continue
+    if blue_score == 1:
+        screen.fill((0, 0, 0))
+        final_text_content = "LEFT WON!"
+        final_text = font.render(final_text_content, True, (255, 255, 255))
+        screen.blit(blue_score_text, (screen.get_width()/2 - screen.get_width()/4 - font_size/2, 50))  # top-left corner
+        screen.blit(red_score_text, (screen.get_width()/2 + screen.get_width()/4 - font_size/2, 50))  # top-left corner
+        screen.blit(final_text, (screen.get_width()/2 - len(final_text_content)*final_text_size/2, screen.get_height()/2 - final_text_size/2))
+        pygame.display.flip()
+        continue
+
+    blue_score_text = font.render(str(blue_score), True, (255, 255, 255))
+    red_score_text = font.render(str(red_score), True, (255, 255, 255))
+    screen.blit(blue_score_text, (240, 50))  # top-left corner
+    screen.blit(red_score_text, (780, 50))  # top-left corner
 
     # --- INPUT ---
     handle_input()
@@ -145,6 +179,18 @@ while running:
 
             ball_speed += 1
 
+        if ball_pos.x < 0:
+            ball_pos.x, ball_pos.y = screen.get_width()/2, screen.get_height()/2
+            ball_running = False
+            x_direction_normalised_global, y_direction_normalised_global = get_ball_direction()
+            red_score += 1
+
+        elif ball_pos.x > screen.get_width():
+            ball_pos.x, ball_pos.y = screen.get_width()/2, screen.get_height()/2
+            ball_running = False
+            x_direction_normalised_global, y_direction_normalised_global = get_ball_direction()
+            blue_score += 1
+
 
     # --- Keep paddles on screen ---
     red_pos.y = clamp_paddle(red_pos.y)
@@ -158,6 +204,8 @@ while running:
 
     pygame.draw.circle(screen, "white", ball_pos, ball_radius)
 
+    screen.blit(blue_score_text, (screen.get_width()/2 - screen.get_width()/4 - font_size/2, 50))  # top-left corner
+    screen.blit(red_score_text, (screen.get_width()/2 + screen.get_width()/4 - font_size/2, 50))  # top-left corner
     pygame.display.flip()
 
     # --- Frame timing ---
