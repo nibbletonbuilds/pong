@@ -111,6 +111,11 @@ while running:
         if event.type == pygame.QUIT:
             running = False
 
+    blue_score_text = font.render(str(blue_score), True, (255, 255, 255))
+    red_score_text = font.render(str(red_score), True, (255, 255, 255))
+    screen.blit(blue_score_text, (240, 50))  # top-left corner
+    screen.blit(red_score_text, (780, 50))  # top-left corner
+
     if red_score == 5:
         screen.fill((0, 0, 0))
         final_text_content = "RIGHT WON!"
@@ -129,11 +134,6 @@ while running:
         screen.blit(final_text, (screen.get_width()/2 - len(final_text_content)*final_text_size/2, screen.get_height()/2 - final_text_size/2))
         pygame.display.flip()
         continue
-
-    blue_score_text = font.render(str(blue_score), True, (255, 255, 255))
-    red_score_text = font.render(str(red_score), True, (255, 255, 255))
-    screen.blit(blue_score_text, (240, 50))  # top-left corner
-    screen.blit(red_score_text, (780, 50))  # top-left corner
 
     # --- INPUT ---
     handle_input()
