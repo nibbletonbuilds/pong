@@ -5,6 +5,11 @@ Fast-paced. Minimalist. Addictively simple.
 
 ---
 
+## 📸 Gameplay Screenshots
+![Pong Gameplay: Opening Screen](gameplay-ss-0.png)
+![Pong Gameplay: During Game](gameplay-ss-1.png)
+![Pong Gameplay: End Screen](gameplay-ss-2.png)
+
 ## 🎮 How to Play
 - **Left Player:** W / S  
 - **Right Player:** ↑ / ↓  
