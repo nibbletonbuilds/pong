@@ -24,4 +24,4 @@ A minimalist remake of Pong — built to explore the core ideas behind classic g
 motion, collision, and control.  
 
 No engines. No shortcuts. Just pure Python logic.  
-Made by **nibbleton** — CS grad × math propagandist.
+Made by **nibbleton** — cs grad × math propagandist.
